@@ -12,13 +12,15 @@ body {
     flex-direction: column;
 }
 
-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    position: relative;
-}
+ main {
+     flex: 1;
+     display: flex;
+     flex-direction: column;
+     padding: 20px;
+     padding: 20px;
+     padding-bottom: 140px;    /* ← reserve space for the 60px input + footer + buffer */
+     position: relative;
+ }
 
 header {
     font-size: 2.2rem;
@@ -30,15 +32,14 @@ header {
     text-align: center;
 }
 
-#chat-box {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 10px;
-    padding-bottom: 200px; /* ↑ increased from 140px to avoid overlap */ 
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+ #chat-box {
+     flex-grow: 1;
+     overflow-y: auto;
+     padding: 10px;
+     display: flex;
+     flex-direction: column;
+     gap: 15px;
+ }
 
 .user-msg,
 .ai-msg {
