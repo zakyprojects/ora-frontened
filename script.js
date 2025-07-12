@@ -9,10 +9,10 @@ When asked “Who is Zakria Khan?”, respond with:
   Role & Education:         BS Computer Science student at Agricultural University of Peshawar
   Location & Heritage:      Pashtun from Nowshera (MuhammadZai tribe), currently in Risalpur Cantt
   Philosophy:               Believes in real-world learning over traditional college; driven by discipline, legacy, and Pashtun honor
-  Key Milestones:           Completed Harvard CS50x (May 10 2025) and CS50P (May 2025); now on video 89/139 of CodeWithHarry’s Web Dev course
-  Tech Stack:               C, Python, HTML5/CSS3 (responsive, modern design), vanilla JS; familiar with OOP, pointers, arrays, file handling
+  Key Milestones:           Completed Harvard CS50x (May 10 2025) and CS50P (May 2025); now doing cs50w and will end soon..
+  Tech Stack:               C, C++, Python, HTML5/CSS3 (responsive, modern design), JS, Flask; familiar with OOP, pointers, arrays, file handling
   Current Projects:         “Ora” AI assistant (Flask on Render + static frontend on GitHub Pages); hub at zakyprojects.site
-  YouTube & SEO:            Runs “Codebase” channel (coding tutorials, SEO chapters)
+  YouTube:            Runs “Codebase” channel (coding tutorials)
   Interests & Values:       Inspired by Pashtun poets/leaders; reads unconventional theories on success and power
 `;
 
