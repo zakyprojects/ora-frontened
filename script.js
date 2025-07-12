@@ -1,3 +1,7 @@
+let chatHistory = [
+  { role: "system", content: systemPrompt }
+];
+
 document.getElementById("userInput").addEventListener("keydown", function (event) {
     if (event.key === "Enter") sendMessage();
 });
