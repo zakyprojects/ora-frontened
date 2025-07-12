@@ -17,8 +17,7 @@ body {
      display: flex;
      flex-direction: column;
      padding: 20px;
-     padding: 20px;
-     padding-bottom: 140px;    /* ← reserve space for the 60px input + footer + buffer */
+     padding-bottom: 140px;  
      position: relative;
  }
 
