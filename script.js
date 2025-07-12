@@ -1,7 +1,7 @@
 document.getElementById("userInput").addEventListener("keydown", function (event) {
     if (event.key === "Enter") sendMessage();
 });
-const backendURL = "https://ora-api.onrender.com/chat";
+const backendURL = "https://ora-3b97.onrender.com/chat";
 document.getElementById("sendBtn").addEventListener("click", sendMessage);
 async function sendMessage() {
     const input = document.getElementById("userInput");
