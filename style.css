@@ -48,6 +48,7 @@ header {
   overflow-y: auto;
   padding: 10px;
   display: flex; flex-direction: column; gap: 15px;
+  padding-bottom: 90px; /* Prevents messages from being hidden behind input area */
 }
 
 /* 6) Messages */
@@ -156,6 +157,9 @@ footer {
   .input-area button {
     width: 36px; height: 36px;
   }
+  #chat-box {
+    padding-bottom: 75px; /* Adjust for smaller input area on tablets */
+  }
 }
 @media (max-width: 480px) {
   header { font-size: clamp(1.2rem, 8vw, 1.8rem); }
@@ -171,5 +175,8 @@ footer {
   }
   .input-area button {
     width: 32px; height: 32px;
+  }
+  #chat-box {
+    padding-bottom: 65px; /* Adjust for smaller input area on mobile */
   }
 }
