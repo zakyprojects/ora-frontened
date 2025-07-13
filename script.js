@@ -1,4 +1,4 @@
-// Particle Connection background effect
+// Particle Connection background
 (function() {
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
@@ -13,12 +13,10 @@
   window.addEventListener('resize', resize);
   resize();
 
-  // enable/disable connection on UI hover
   window.addEventListener('mousemove', e => {
     cursor.x = e.clientX;
     cursor.y = e.clientY;
-    const overUI = !!e.target.closest('button, input, .user-msg, .ai-msg');
-    enableConnection = !overUI;
+    enableConnection = !e.target.closest('button, input, .user-msg, .ai-msg');
   });
   window.addEventListener('mouseout', () => { cursor.x = -9999; cursor.y = -9999; });
 
@@ -32,7 +30,7 @@
     }
     draw() {
       ctx.beginPath();
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#fff';
       ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
       ctx.fill();
       ctx.closePath();
@@ -41,7 +39,7 @@
 
   const particles = Array.from({ length: 150 }, () => new Particle());
 
-  function animateParticles() {
+  function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach(p => {
       const dx = p.x - cursor.x;
@@ -60,12 +58,12 @@
       if (p.x <= 0 || p.x >= canvas.width) p.vx *= -1;
       if (p.y <= 0 || p.y >= canvas.height) p.vy *= -1;
     });
-    requestAnimationFrame(animateParticles);
+    requestAnimationFrame(animate);
   }
-  animateParticles();
+  animate();
 })();
 
-// Chat send logic
+// Chat logic
 const inputEl = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const chatBox = document.getElementById('chat-box');
@@ -95,14 +93,14 @@ async function sendMessage() {
     const data = await res.json();
     appendMessage(data.reply, 'ai-msg');
     chatHistory.push({ role: 'assistant', content: data.reply });
-  } catch (err) {
+  } catch {
     appendMessage('⚠️ Could not reach Ora backend.', 'ai-msg');
   } finally {
     sendBtn.disabled = false;
   }
 }
 
+// click & key listeners
 sendBtn.addEventListener('click', sendMessage);
-inputEl.addEventListener('keydown', e => {
-  if (e.key === 'Enter') sendMessage();
-});
+inputEl.addEventListener('keydown', e => { if (e.key==='Enter') sendMessage(); });
+inputEl.addEventListener('keypress', e => { if (e.key==='Enter') { e.preventDefault(); sendMessage(); } });

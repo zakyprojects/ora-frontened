@@ -10,22 +10,41 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Particle canvas background -->
+  <!-- PARTICLE BACKGROUND -->
   <canvas id="canvas"></canvas>
 
-  <!-- All UI content sits here -->
+  <!-- UI CONTENT -->
   <div class="content">
     <header>🤖 Talk to Ora</header>
 
     <div id="chat-box">
-      <div class="ai-msg fade-in">Hi, I’m Ora, Zaky’s personal assistant. How can I assist you today?</div>
+      <div class="ai-msg fade-in">
+        Hi, I’m Ora, Zaky’s personal assistant. How can I assist you today?
+      </div>
     </div>
 
     <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off" />
-      <button id="sendBtn" aria-label="Send message">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="#2d6db3"/>
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Type your message..."
+        autocomplete="off"
+      />
+      <button
+        id="sendBtn"
+        type="button"
+        aria-label="Send message"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2 21L23 12L2 3V10L17 12L2 14V21Z"
+            fill="#FFFFFF"
+          />
         </svg>
       </button>
     </div>

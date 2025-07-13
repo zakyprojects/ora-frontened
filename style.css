@@ -1,4 +1,4 @@
-/* Full-screen particle canvas behind content */
+/* Particle canvas behind content */
 #canvas {
   position: fixed;
   top: 0;
@@ -9,7 +9,7 @@
   pointer-events: none;
 }
 
-/* Wrapper for UI */
+/* UI wrapper */
 .content {
   position: relative;
   z-index: 1;
@@ -18,7 +18,7 @@
   min-height: 100vh;
 }
 
-/* Reset & Base */
+/* Reset & base */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,7 +40,7 @@ header {
   animation: fadeInDown 0.8s ease-out;
 }
 
-/* Chat Box */
+/* Chat box */
 #chat-box {
   flex: 1;
   overflow-y: auto;
@@ -69,13 +69,13 @@ header {
   color: #e6edf3;
 }
 
-/* Input Area */
+/* Input area */
 .input-area {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgba(13,17,23,0.9);
+  background: #2d6db3;
   border-radius: 30px;
   margin: 10px 20px;
   position: sticky;
@@ -87,16 +87,15 @@ header {
   flex: 1;
   padding: 12px;
   border-radius: 20px;
-  border: 1px solid #58a6ff;
+  border: none;
   background-color: #0d1117;
   color: #e6edf3;
   outline: none;
   font-size: 1rem;
-  transition: box-shadow 0.3s, border-color 0.3s;
+  transition: box-shadow 0.3s;
 }
 .input-area input:focus {
-  box-shadow: 0 0 8px #58a6ff;
-  border-color: #58a6ff;
+  box-shadow: 0 0 8px #ffffff;
 }
 .input-area button {
   background: transparent;
@@ -108,12 +107,14 @@ header {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  pointer-events: auto;
 }
 .input-area button svg path {
   transition: fill 0.3s;
+  fill: #ffffff;
 }
 .input-area button:hover svg path {
-  fill: #4692dc;
+  fill: #e6edf3;
 }
 
 /* Footer */
@@ -129,7 +130,7 @@ footer {
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px);} to { opacity: 1; transform: translateY(0);} }
 @keyframes fadeInUp   { from { opacity: 0; transform: translateY(20px);}  to { opacity: 1; transform: translateY(0);} }
 
-/* Responsive */
+/* Responsive tweaks */
 @media (max-width: 768px) {
   header { font-size: clamp(1.5rem,6vw,2rem); margin: 15px 0; }
   .input-area { margin: 8px 15px; width: calc(100% - 30px); }
