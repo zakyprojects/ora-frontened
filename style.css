@@ -1,5 +1,4 @@
-/* style.css  :contentReference[oaicite:6]{index=6} */
-
+/* ————————————————————————————— */
 /* 1) Particle canvas behind content */
 #canvas {
   position: fixed;
@@ -19,7 +18,11 @@
 }
 
 /* 3) Reset & Base */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom right, #0d1117, #161b22);
@@ -28,23 +31,15 @@ body {
   min-height: 100vh;
 }
 
-/* 4) Header with glow */
+/* 4) Header */
 header {
   font-size: clamp(1.8rem, 5vw, 2.5rem);
   font-weight: bold;
   color: #58a6ff;
   text-align: center;
   margin: 20px 0;
-  text-shadow:
-    0 0 4px rgba(88,166,255,0.6),
-    0 0 8px rgba(88,166,255,0.4);
-  transition: text-shadow 0.3s ease;
+  text-shadow: 0 0 20px rgba(88,166,255,0.3);
   animation: fadeInDown 0.8s ease-out;
-}
-header:hover {
-  text-shadow:
-    0 0 8px rgba(88,166,255,0.8),
-    0 0 16px rgba(88,166,255,0.6);
 }
 
 /* 5) Chat area */
@@ -52,12 +47,10 @@ header:hover {
   flex: 1;
   overflow-y: auto;
   padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  display: flex; flex-direction: column; gap: 15px;
 }
 
-/* 6) Messages with glow pulses */
+/* 6) Messages */
 .user-msg, .ai-msg {
   padding: 12px 18px;
   border-radius: 20px;
@@ -65,92 +58,76 @@ header:hover {
   word-wrap: break-word;
   animation: fadeInUp 0.6s ease-out;
 }
-
-/* User bubble: green glow */
 .user-msg {
   align-self: flex-end;
-  background-color: #0f3;
+  background-color: #238636; /* original green ▼ */
   color: #fff;
-  box-shadow: 0 0 12px rgba(0,255,0,0.6);
-  transition: box-shadow 0.3s ease;
 }
-.user-msg.new {
-  animation: pulseGreen 0.6s ease-out;
-}
-@keyframes pulseGreen {
-  0%   { box-shadow: 0 0 2px rgba(0,255,0,0.2); }
-  50%  { box-shadow: 0 0 20px rgba(0,255,0,0.8); }
-  100% { box-shadow: 0 0 8px rgba(0,255,0,0.6); }
-}
-
-/* AI bubble: blue glow */
 .ai-msg {
   align-self: flex-start;
   background-color: #343942;
   color: #e6edf3;
-  box-shadow: 0 0 10px rgba(88,166,255,0.5);
-  transition: box-shadow 0.3s ease;
-}
-.ai-msg.new {
-  animation: pulseBlue 0.8s ease-out;
-}
-@keyframes pulseBlue {
-  0%   { box-shadow: 0 0 2px rgba(88,166,255,0.2); }
-  50%  { box-shadow: 0 0 15px rgba(88,166,255,0.7); }
-  100% { box-shadow: 0 0 10px rgba(88,166,255,0.5); }
 }
 
-/* 7) Input area with glow */
+/* 7) Input area container (dark overlay) */
 .input-area {
-  position: sticky;
-  bottom: 0;
+  position: fixed;
+  bottom: 60px;
+  left: 20px;
+  right: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: #2d6db3;
+  gap: 10px;
+  background: rgba(13, 17, 23, 0.9); /* original panel ▼ */
+  padding: 10px;
   border-radius: 30px;
-  margin: 0 10px 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   z-index: 2;
 }
 
+/* 8) User input – dark field with blue outline and glow ▼ */
 .input-area input {
-  flex: 1; padding: 12px;
-  border-radius: 20px;
-  border: 1px solid #58a6ff;
-  background: transparent;
+  flex-grow: 1;
+  padding: 16px;
+  border-radius: 24px;
+  border: 1px solid #58a6ff;            /* original outline ▼ */ 
+  background-color: #0d1117;            /* dark fill ▼ */
   color: #e6edf3;
   font-size: 1rem;
-  transition: box-shadow 0.3s;
-  box-shadow: 0 0 10px rgba(88,166,255,0.6);
+  box-shadow: 0 0 10px #58a6ff;         /* soft glow ▼ */
+  outline: none;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .input-area input:focus {
-  outline: none;
-  box-shadow: 0 0 20px rgba(88,166,255,0.8);
+  box-shadow: 0 0 12px #58a6ff;         /* stronger glow on focus ▼ */
+  border-color: #58a6ff;
 }
+/* :contentReference[oaicite:3]{index=3} */
 
+/* 9) Send button – white SVG circle with blue arrow, no blue bg ▼ */
 .input-area button {
   flex-shrink: 0;
-  width: 36px; height: 36px;
-  background: #ffffff;
+  width: 40px;
+  height: 40px;
+  background: transparent; /* back to transparent ▼ */
   border: none;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  transition: background 0.3s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
 }
-.input-area button svg path {
-  transition: fill 0.3s;
+.input-area button:active {
+  transform: scale(0.95);
 }
-.input-area button:hover {
-  background: #e6edf3;
+.input-area button svg {
+  width: 100%;
+  height: 100%;
 }
-.input-area button:hover svg path {
-  fill: #2d6db3;
-}
+/* SVG itself draws the white circle and blue arrow ▼ */
 
-/* 8) Footer */
+/* 10) Footer */
 footer {
   text-align: center;
   color: #8b949e;
@@ -159,19 +136,40 @@ footer {
   animation: fadeInUp 0.8s ease-out 0.3s both;
 }
 
-/* 9) Animations */
+/* 11) Animations */
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px);} to { opacity: 1; transform: translateY(0);} }
 @keyframes fadeInUp   { from { opacity: 0; transform: translateY(20px);}  to { opacity: 1; transform: translateY(0);} }
 
-/* 10) Responsive tweaks */
+/* 12) Responsive tweaks for tablets & phones */
 @media (max-width: 768px) {
-  header { font-size: clamp(1.5rem,6vw,2rem); margin: 15px 0; }
-  .input-area { margin: 0 8px 8px; padding: 6px 12px; }
-  .input-area button { width: 34px; height: 34px; }
+  header { font-size: clamp(1.5rem, 6vw, 2rem); margin: 15px 0; }
+  .input-area {
+    bottom: 50px;
+    padding: 8px 12px;
+    left: 15px; right: 15px;
+    gap: 8px;
+  }
+  .input-area input {
+    padding: 14px;
+    font-size: 0.95rem;
+  }
+  .input-area button {
+    width: 36px; height: 36px;
+  }
 }
 @media (max-width: 480px) {
-  header { font-size: clamp(1.2rem,8vw,1.8rem); }
-  .input-area { margin: 0 5px 5px; padding: 6px 10px; }
-  .input-area button { width: 32px; height: 32px; }
-  #chat-box { padding: 8px; gap: 10px; }
+  header { font-size: clamp(1.2rem, 8vw, 1.8rem); }
+  .input-area {
+    bottom: 45px;
+    padding: 6px 10px;
+    left: 10px; right: 10px;
+    gap: 6px;
+  }
+  .input-area input {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  .input-area button {
+    width: 32px; height: 32px;
+  }
 }
