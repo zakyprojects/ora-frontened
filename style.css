@@ -1,15 +1,15 @@
-/* Particle canvas fixed behind content */
+/* style.css  :contentReference[oaicite:6]{index=6} */
+
+/* 1) Particle canvas behind content */
 #canvas {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   z-index: -1;
   pointer-events: none;
 }
 
-/* UI wrapper */
+/* 2) UI wrapper */
 .content {
   position: relative;
   z-index: 1;
@@ -18,29 +18,36 @@
   min-height: 100vh;
 }
 
-/* Reset & Base */
+/* 3) Reset & Base */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom right, #0d1117, #161b22);
   color: #e6edf3;
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: column;
   min-height: 100vh;
 }
 
-/* Header */
+/* 4) Header with glow */
 header {
   font-size: clamp(1.8rem, 5vw, 2.5rem);
   font-weight: bold;
   color: #58a6ff;
   text-align: center;
-  text-shadow: 0 0 20px rgba(88,166,255,0.3);
   margin: 20px 0;
+  text-shadow:
+    0 0 4px rgba(88,166,255,0.6),
+    0 0 8px rgba(88,166,255,0.4);
+  transition: text-shadow 0.3s ease;
   animation: fadeInDown 0.8s ease-out;
 }
+header:hover {
+  text-shadow:
+    0 0 8px rgba(88,166,255,0.8),
+    0 0 16px rgba(88,166,255,0.6);
+}
 
-/* Chat area */
+/* 5) Chat area */
 #chat-box {
   flex: 1;
   overflow-y: auto;
@@ -50,7 +57,7 @@ header {
   gap: 15px;
 }
 
-/* Messages */
+/* 6) Messages with glow pulses */
 .user-msg, .ai-msg {
   padding: 12px 18px;
   border-radius: 20px;
@@ -58,18 +65,42 @@ header {
   word-wrap: break-word;
   animation: fadeInUp 0.6s ease-out;
 }
+
+/* User bubble: green glow */
 .user-msg {
   align-self: flex-end;
-  background-color: #238636;
+  background-color: #0f3;
   color: #fff;
+  box-shadow: 0 0 12px rgba(0,255,0,0.6);
+  transition: box-shadow 0.3s ease;
 }
+.user-msg.new {
+  animation: pulseGreen 0.6s ease-out;
+}
+@keyframes pulseGreen {
+  0%   { box-shadow: 0 0 2px rgba(0,255,0,0.2); }
+  50%  { box-shadow: 0 0 20px rgba(0,255,0,0.8); }
+  100% { box-shadow: 0 0 8px rgba(0,255,0,0.6); }
+}
+
+/* AI bubble: blue glow */
 .ai-msg {
   align-self: flex-start;
   background-color: #343942;
   color: #e6edf3;
+  box-shadow: 0 0 10px rgba(88,166,255,0.5);
+  transition: box-shadow 0.3s ease;
+}
+.ai-msg.new {
+  animation: pulseBlue 0.8s ease-out;
+}
+@keyframes pulseBlue {
+  0%   { box-shadow: 0 0 2px rgba(88,166,255,0.2); }
+  50%  { box-shadow: 0 0 15px rgba(88,166,255,0.7); }
+  100% { box-shadow: 0 0 10px rgba(88,166,255,0.5); }
 }
 
-/* Input area */
+/* 7) Input area with glow */
 .input-area {
   position: sticky;
   bottom: 0;
@@ -83,30 +114,29 @@ header {
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
   z-index: 2;
 }
+
 .input-area input {
-  flex: 1;
-  padding: 12px;
+  flex: 1; padding: 12px;
   border-radius: 20px;
-  border: none;
-  background-color: #0d1117;
+  border: 1px solid #58a6ff;
+  background: transparent;
   color: #e6edf3;
-  outline: none;
   font-size: 1rem;
   transition: box-shadow 0.3s;
+  box-shadow: 0 0 10px rgba(88,166,255,0.6);
 }
 .input-area input:focus {
-  box-shadow: 0 0 8px #ffffff;
+  outline: none;
+  box-shadow: 0 0 20px rgba(88,166,255,0.8);
 }
+
 .input-area button {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 36px; height: 36px;
   background: #ffffff;
   border: none;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   transition: background 0.3s;
 }
@@ -120,7 +150,7 @@ header {
   fill: #2d6db3;
 }
 
-/* Footer */
+/* 8) Footer */
 footer {
   text-align: center;
   color: #8b949e;
@@ -129,11 +159,11 @@ footer {
   animation: fadeInUp 0.8s ease-out 0.3s both;
 }
 
-/* Animations */
+/* 9) Animations */
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px);} to { opacity: 1; transform: translateY(0);} }
 @keyframes fadeInUp   { from { opacity: 0; transform: translateY(20px);}  to { opacity: 1; transform: translateY(0);} }
 
-/* Responsive tweaks */
+/* 10) Responsive tweaks */
 @media (max-width: 768px) {
   header { font-size: clamp(1.5rem,6vw,2rem); margin: 15px 0; }
   .input-area { margin: 0 8px 8px; padding: 6px 12px; }

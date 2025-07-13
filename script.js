@@ -1,3 +1,5 @@
+// script.js  :contentReference[oaicite:5]{index=5}
+
 // Particle Connection background
 (function() {
   const canvas = document.getElementById('canvas');
@@ -14,15 +16,17 @@
   resize();
 
   // Track hover/touch on UI to disable connections
-  ['mousemove','touchstart','touchmove'].forEach(evt => {
+  ['mousemove','touchstart','touchmove'].forEach(evt =>
     window.addEventListener(evt, e => {
       const x = e.clientX || (e.touches && e.touches[0].clientX) || cursor.x;
       const y = e.clientY || (e.touches && e.touches[0].clientY) || cursor.y;
       cursor = { x, y };
       enableConnection = !e.target.closest('button, input, .user-msg, .ai-msg');
-    }, { passive: true });
+    }, { passive: true })
+  );
+  window.addEventListener('mouseout', () => {
+    cursor = { x: -9999, y: -9999 };
   });
-  window.addEventListener('mouseout', () => { cursor = { x: -9999, y: -9999 }; });
 
   class Particle {
     constructor() {
@@ -74,10 +78,13 @@ let chatHistory = [{ role: 'system', content: 'You are Ora, a personal AI assist
 
 function appendMessage(text, cls) {
   const msg = document.createElement('div');
-  msg.className = cls + ' fade-in';
+  msg.className = cls + ' fade-in new';
   msg.textContent = text;
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
+  // pulse/glow animation cleanup
+  const timeout = cls === 'user-msg' ? 600 : 800;
+  setTimeout(() => msg.classList.remove('new'), timeout);
 }
 
 async function sendMessage() {
@@ -103,9 +110,10 @@ async function sendMessage() {
   }
 }
 
-// Send on click or touchstart
-['click','touchstart'].forEach(evt => sendBtn.addEventListener(evt, e => { e.preventDefault(); sendMessage(); }));
-// Send on Enter key only
+// Send on click/touch or Enter key
+['click','touchstart'].forEach(evt =>
+  sendBtn.addEventListener(evt, e => { e.preventDefault(); sendMessage(); })
+);
 inputEl.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     e.preventDefault();
