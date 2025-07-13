@@ -2,8 +2,10 @@
 /* 1) Particle canvas behind content */
 #canvas {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: -1;
   pointer-events: none;
 }
@@ -27,7 +29,8 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom right, #0d1117, #161b22);
   color: #e6edf3;
-  display: flex; flex-direction: column;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
@@ -47,8 +50,17 @@ header {
   flex: 1;
   overflow-y: auto;
   padding: 10px;
-  display: flex; flex-direction: column; gap: 15px;
-  padding-bottom: 90px; /* Prevents messages from being hidden behind input area */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /* bottom spacing now via the ::after pseudo-element below */
+}
+/* reserve space equal to your fixed input area */
+#chat-box::after {
+  content: '';
+  display: block;
+  height: 90px;
+  flex-shrink: 0;
 }
 
 /* 6) Messages */
@@ -61,7 +73,7 @@ header {
 }
 .user-msg {
   align-self: flex-end;
-  background-color: #238636; /* original green ▼ */
+  background-color: #238636;
   color: #fff;
 }
 .ai-msg {
@@ -79,38 +91,37 @@ header {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(13, 17, 23, 0.9); /* original panel ▼ */
+  background: rgba(13, 17, 23, 0.9);
   padding: 10px;
   border-radius: 30px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-  z-index: 2;
+  z-index: 2; /* ensure input sits above chat */
 }
 
-/* 8) User input – dark field with blue outline and glow ▼ */
+/* 8) User input – dark field with blue outline and glow */
 .input-area input {
   flex-grow: 1;
   padding: 16px;
   border-radius: 24px;
-  border: 1px solid #58a6ff;            /* original outline ▼ */ 
-  background-color: #0d1117;            /* dark fill ▼ */
+  border: 1px solid #58a6ff;
+  background-color: #0d1117;
   color: #e6edf3;
   font-size: 1rem;
-  box-shadow: 0 0 10px #58a6ff;         /* soft glow ▼ */
+  box-shadow: 0 0 10px #58a6ff;
   outline: none;
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .input-area input:focus {
-  box-shadow: 0 0 12px #58a6ff;         /* stronger glow on focus ▼ */
+  box-shadow: 0 0 12px #58a6ff;
   border-color: #58a6ff;
 }
-/* :contentReference[oaicite:3]{index=3} */
 
-/* 9) Send button – white SVG circle with blue arrow, no blue bg ▼ */
+/* 9) Send button – white SVG circle with blue arrow */
 .input-area button {
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: transparent; /* back to transparent ▼ */
+  background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
@@ -126,7 +137,6 @@ header {
   width: 100%;
   height: 100%;
 }
-/* SVG itself draws the white circle and blue arrow ▼ */
 
 /* 10) Footer */
 footer {
@@ -138,16 +148,26 @@ footer {
 }
 
 /* 11) Animations */
-@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px);} to { opacity: 1; transform: translateY(0);} }
-@keyframes fadeInUp   { from { opacity: 0; transform: translateY(20px);}  to { opacity: 1; transform: translateY(0);} }
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px);  }
+  to   { opacity: 1; transform: translateY(0);     }
+}
 
-/* 12) Responsive tweaks for tablets & phones */
+/* 12) Responsive tweaks */
 @media (max-width: 768px) {
-  header { font-size: clamp(1.5rem, 6vw, 2rem); margin: 15px 0; }
+  header {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    margin: 15px 0;
+  }
   .input-area {
     bottom: 50px;
     padding: 8px 12px;
-    left: 15px; right: 15px;
+    left: 15px;
+    right: 15px;
     gap: 8px;
   }
   .input-area input {
@@ -155,18 +175,22 @@ footer {
     font-size: 0.95rem;
   }
   .input-area button {
-    width: 36px; height: 36px;
+    width: 36px;
+    height: 36px;
   }
-  #chat-box {
-    padding-bottom: 75px; /* Adjust for smaller input area on tablets */
+  #chat-box::after {
+    height: 75px;
   }
 }
 @media (max-width: 480px) {
-  header { font-size: clamp(1.2rem, 8vw, 1.8rem); }
+  header {
+    font-size: clamp(1.2rem, 8vw, 1.8rem);
+  }
   .input-area {
     bottom: 45px;
     padding: 6px 10px;
-    left: 10px; right: 10px;
+    left: 10px;
+    right: 10px;
     gap: 6px;
   }
   .input-area input {
@@ -174,9 +198,10 @@ footer {
     font-size: 0.9rem;
   }
   .input-area button {
-    width: 32px; height: 32px;
+    width: 32px;
+    height: 32px;
   }
-  #chat-box {
-    padding-bottom: 65px; /* Adjust for smaller input area on mobile */
+  #chat-box::after {
+    height: 65px;
   }
 }
