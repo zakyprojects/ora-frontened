@@ -3,13 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Ora – Your AI Assistant by Zakria Khan. Ask anything, get instant answers.">
-  <meta name="author" content="Zakria Khan">
+  <meta name="description" content="Ora – Your AI Assistant by Zakria Khan. Ask anything, get instant answers." />
+  <meta name="author" content="Zakria Khan" />
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <title>Ora – Zaky’s Personal Assistant</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Particle banner section -->
+  <section id="banner">
+    <div>
+      <h1>Particle connection</h1>
+      <p>Hover on to see connection between particles</p>
+    </div>
+    <canvas id="canvas"></canvas>
+  </section>
+
   <main>
     <header>🤖 Talk to Ora</header>
     <div id="chat-box">
@@ -22,11 +31,11 @@
           <circle cx="12" cy="12" r="11" fill="white"/>
           <path d="M9 6L15 12L9 18" stroke="#2d6db3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        
       </button>
     </div>
     <footer>Built with ❤️ by Zakria Khan – Powered by Gemini</footer>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
