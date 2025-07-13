@@ -1,6 +1,4 @@
-// script.js  :contentReference[oaicite:5]{index=5}
-
-// Particle Connection background
+// Particle Connection background (unchanged) …
 (function() {
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
@@ -15,7 +13,6 @@
   window.addEventListener('resize', resize);
   resize();
 
-  // Track hover/touch on UI to disable connections
   ['mousemove','touchstart','touchmove'].forEach(evt =>
     window.addEventListener(evt, e => {
       const x = e.clientX || (e.touches && e.touches[0].clientX) || cursor.x;
@@ -71,6 +68,7 @@
 })();
 
 // Chat logic
+const BACKEND_URL = 'https://ora-3b97.onrender.com';  // update if you redeploy
 const inputEl = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const chatBox = document.getElementById('chat-box');
@@ -82,7 +80,6 @@ function appendMessage(text, cls) {
   msg.textContent = text;
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
-  // pulse/glow animation cleanup
   const timeout = cls === 'user-msg' ? 600 : 800;
   setTimeout(() => msg.classList.remove('new'), timeout);
 }
@@ -94,16 +91,31 @@ async function sendMessage() {
   chatHistory.push({ role: 'user', content: text });
   inputEl.value = '';
   sendBtn.disabled = true;
+
   try {
-    const res = await fetch('https://ora-3b97.onrender.com/chat', {
+    const res = await fetch(`${BACKEND_URL}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: chatHistory })
     });
-    const data = await res.json();
-    appendMessage(data.reply, 'ai-msg');
-    chatHistory.push({ role: 'assistant', content: data.reply });
-  } catch {
+
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      appendMessage('⚠️ Invalid response from server.', 'ai-msg');
+      return;
+    }
+
+    if (!res.ok) {
+      // show server-side error (e.g. quota, internal)
+      appendMessage(`⚠️ ${data.error || 'Server error occurred.'}`, 'ai-msg');
+    } else {
+      appendMessage(data.reply, 'ai-msg');
+      chatHistory.push({ role: 'assistant', content: data.reply });
+    }
+  } catch (error) {
+    // network or CORS failure
     appendMessage('⚠️ Could not reach Ora backend.', 'ai-msg');
   } finally {
     sendBtn.disabled = false;
