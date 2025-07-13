@@ -1,4 +1,4 @@
-/* Particle canvas behind content */
+/* Particle canvas fixed behind content */
 #canvas {
   position: fixed;
   top: 0;
@@ -18,7 +18,7 @@
   min-height: 100vh;
 }
 
-/* Reset & base */
+/* Reset & Base */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,7 +40,7 @@ header {
   animation: fadeInDown 0.8s ease-out;
 }
 
-/* Chat box */
+/* Chat area */
 #chat-box {
   flex: 1;
   overflow-y: auto;
@@ -71,17 +71,17 @@ header {
 
 /* Input area */
 .input-area {
+  position: sticky;
+  bottom: 0;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
   background: #2d6db3;
   border-radius: 30px;
-  margin: 10px 20px;
-  position: sticky;
-  bottom: 0;
-  width: calc(100% - 40px);
+  margin: 0 10px 10px;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  z-index: 2;
 }
 .input-area input {
   flex: 1;
@@ -98,23 +98,26 @@ header {
   box-shadow: 0 0 8px #ffffff;
 }
 .input-area button {
-  background: transparent;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
   border: none;
-  padding: 0;
-  width: 40px;
-  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  pointer-events: auto;
+  transition: background 0.3s;
 }
 .input-area button svg path {
   transition: fill 0.3s;
-  fill: #ffffff;
+}
+.input-area button:hover {
+  background: #e6edf3;
 }
 .input-area button:hover svg path {
-  fill: #e6edf3;
+  fill: #2d6db3;
 }
 
 /* Footer */
@@ -133,10 +136,12 @@ footer {
 /* Responsive tweaks */
 @media (max-width: 768px) {
   header { font-size: clamp(1.5rem,6vw,2rem); margin: 15px 0; }
-  .input-area { margin: 8px 15px; width: calc(100% - 30px); }
+  .input-area { margin: 0 8px 8px; padding: 6px 12px; }
+  .input-area button { width: 34px; height: 34px; }
 }
 @media (max-width: 480px) {
   header { font-size: clamp(1.2rem,8vw,1.8rem); }
-  .input-area { margin: 6px 10px; width: calc(100% - 20px); }
+  .input-area { margin: 0 5px 5px; padding: 6px 10px; }
+  .input-area button { width: 32px; height: 32px; }
   #chat-box { padding: 8px; gap: 10px; }
 }

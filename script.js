@@ -13,12 +13,16 @@
   window.addEventListener('resize', resize);
   resize();
 
-  window.addEventListener('mousemove', e => {
-    cursor.x = e.clientX;
-    cursor.y = e.clientY;
-    enableConnection = !e.target.closest('button, input, .user-msg, .ai-msg');
+  // Track hover/touch on UI to disable connections
+  ['mousemove','touchstart','touchmove'].forEach(evt => {
+    window.addEventListener(evt, e => {
+      const x = e.clientX || (e.touches && e.touches[0].clientX) || cursor.x;
+      const y = e.clientY || (e.touches && e.touches[0].clientY) || cursor.y;
+      cursor = { x, y };
+      enableConnection = !e.target.closest('button, input, .user-msg, .ai-msg');
+    }, { passive: true });
   });
-  window.addEventListener('mouseout', () => { cursor.x = -9999; cursor.y = -9999; });
+  window.addEventListener('mouseout', () => { cursor = { x: -9999, y: -9999 }; });
 
   class Particle {
     constructor() {
@@ -33,7 +37,6 @@
       ctx.fillStyle = '#fff';
       ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
       ctx.fill();
-      ctx.closePath();
     }
   }
 
@@ -100,7 +103,12 @@ async function sendMessage() {
   }
 }
 
-// click & key listeners
-sendBtn.addEventListener('click', sendMessage);
-inputEl.addEventListener('keydown', e => { if (e.key==='Enter') sendMessage(); });
-inputEl.addEventListener('keypress', e => { if (e.key==='Enter') { e.preventDefault(); sendMessage(); } });
+// Send on click or touchstart
+['click','touchstart'].forEach(evt => sendBtn.addEventListener(evt, e => { e.preventDefault(); sendMessage(); }));
+// Send on Enter key only
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    sendMessage();
+  }
+});
