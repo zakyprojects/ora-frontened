@@ -1,4 +1,4 @@
-// Particle Connection background (unchanged)
+// Particle background (unchanged)
 (function() {
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
@@ -29,8 +29,8 @@
     constructor() {
       this.x = Math.random() * canvas.width;
       this.y = Math.random() * canvas.height;
-      this.vx = (Math.random() - 0.5) * 1;
-      this.vy = (Math.random() - 0.5) * 1;
+      this.vx = (Math.random() - 0.5);
+      this.vy = (Math.random() - 0.5);
       this.size = Math.random() * 4;
     }
     draw() {
@@ -68,7 +68,7 @@
 })();
 
 // Chat logic
-const BACKEND_URL = 'https://ora-3b97.onrender.com';  // update if you redeploy
+const BACKEND_URL = 'https://ora-3b97.onrender.com';
 const inputEl = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const chatBox = document.getElementById('chat-box');
@@ -93,12 +93,9 @@ async function sendMessage() {
   inputEl.value = '';
   sendBtn.disabled = true;
 
-  // Show loading indicator
   const loadingMsg = document.createElement('div');
   loadingMsg.className = 'ai-msg loading fade-in new';
-  loadingMsg.textContent = isFirstMessage
-    ? '⏳ Server is starting, please wait...'
-    : '⏳ Loading...';
+  loadingMsg.textContent = isFirstMessage ? '⏳ Server is starting, please wait...' : '⏳ Loading...';
   chatBox.appendChild(loadingMsg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -135,8 +132,8 @@ async function sendMessage() {
   }
 }
 
-// Send on click/touch or Enter key
-['click','touchstart'].forEach(evt =>
+// Send on click or Enter
+['click', 'touchstart'].forEach(evt =>
   sendBtn.addEventListener(evt, e => { e.preventDefault(); sendMessage(); })
 );
 inputEl.addEventListener('keydown', e => {
@@ -144,4 +141,11 @@ inputEl.addEventListener('keydown', e => {
     e.preventDefault();
     sendMessage();
   }
+});
+
+// FIX: Scroll to bottom on focus (for mobile)
+inputEl.addEventListener('focus', () => {
+  setTimeout(() => {
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }, 300);
 });
