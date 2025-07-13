@@ -1,42 +1,5 @@
 /* ————————————————————————————— */
-/* 1) RESET & BOX-SIZING */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* ————————————————————————————— */
-/* 2) PREVENT WHOLE-PAGE SCROLL */
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
-
-/* ————————————————————————————— */
-/* 3) BODY BASE */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to bottom right, #0d1117, #161b22);
-  color: #e6edf3;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ————————————————————————————— */
-/* 4) MAIN WRAPPER */
-main {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  position: relative;
-  /* allow children to shrink for flex scroll to work */
-  min-height: 0;
-}
-
-/* ————————————————————————————— */
-/* 5) PARTICLE CANVAS */
+/* 1) Particle canvas behind content */
 #canvas {
   position: fixed;
   top: 0; left: 0;
@@ -45,10 +8,31 @@ main {
   pointer-events: none;
 }
 
-/* ————————————————————————————— */
-/* 6) HEADER */
+/* 2) UI wrapper */
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 3) Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom right, #0d1117, #161b22);
+  color: #e6edf3;
+  display: flex; flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 4) Header */
 header {
-  flex: 0 0 auto;
   font-size: clamp(1.8rem, 5vw, 2.5rem);
   font-weight: bold;
   color: #58a6ff;
@@ -58,23 +42,16 @@ header {
   animation: fadeInDown 0.8s ease-out;
 }
 
-/* ————————————————————————————— */
-/* 7) CHAT BOX (SCROLLABLE) */
+/* 5) Chat area */
 #chat-box {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 10px;
-  /* reserve space so messages never go under input+footer */
-  padding-bottom: 200px;
+  flex: 1;
   overflow-y: auto;
-  min-height: 0; /* critical for flex children */
-  overscroll-behavior: contain;
+  padding: 10px;
+  display: flex; flex-direction: column; gap: 15px;
+  padding-bottom: 90px; /* Prevents messages from being hidden behind input area */
 }
 
-/* ————————————————————————————— */
-/* 8) MESSAGES */
+/* 6) Messages */
 .user-msg, .ai-msg {
   padding: 12px 18px;
   border-radius: 20px;
@@ -84,7 +61,7 @@ header {
 }
 .user-msg {
   align-self: flex-end;
-  background-color: #238636;
+  background-color: #238636; /* original green ▼ */
   color: #fff;
 }
 .ai-msg {
@@ -93,8 +70,7 @@ header {
   color: #e6edf3;
 }
 
-/* ————————————————————————————— */
-/* 9) FIXED INPUT BAR */
+/* 7) Input area container (dark overlay) */
 .input-area {
   position: fixed;
   bottom: 60px;
@@ -103,34 +79,40 @@ header {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(13,17,23,0.9);
+  background: rgba(13, 17, 23, 0.9); /* original panel ▼ */
   padding: 10px;
   border-radius: 30px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   z-index: 2;
 }
+
+/* 8) User input – dark field with blue outline and glow ▼ */
 .input-area input {
-  flex: 1;
+  flex-grow: 1;
   padding: 16px;
-  border: 1px solid #58a6ff;
   border-radius: 24px;
-  background-color: #0d1117;
+  border: 1px solid #58a6ff;            /* original outline ▼ */ 
+  background-color: #0d1117;            /* dark fill ▼ */
   color: #e6edf3;
   font-size: 1rem;
-  box-shadow: 0 0 10px #58a6ff;
+  box-shadow: 0 0 10px #58a6ff;         /* soft glow ▼ */
   outline: none;
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .input-area input:focus {
+  box-shadow: 0 0 12px #58a6ff;         /* stronger glow on focus ▼ */
   border-color: #58a6ff;
-  box-shadow: 0 0 12px #58a6ff;
 }
+
+/* 9) Send button – white SVG circle with blue arrow, no blue bg ▼ */
 .input-area button {
   flex-shrink: 0;
-  width: 40px; height: 40px;
-  background: transparent;
+  width: 40px;
+  height: 40px;
+  background: transparent; /* back to transparent ▼ */
   border: none;
   cursor: pointer;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,46 +122,31 @@ header {
   transform: scale(0.95);
 }
 .input-area button svg {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
 }
+/* SVG itself draws the white circle and blue arrow ▼ */
 
-/* ————————————————————————————— */
-/* 10) FOOTER */
+/* 10) Footer */
 footer {
-  position: fixed;
-  bottom: 0;
-  left: 20px;
-  right: 20px;
   text-align: center;
   color: #8b949e;
   padding: 8px 0;
   font-size: 0.85rem;
-  background: transparent;
   animation: fadeInUp 0.8s ease-out 0.3s both;
 }
 
-/* ————————————————————————————— */
-/* 11) ANIMATIONS */
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0);     }
-}
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px);  }
-  to   { opacity: 1; transform: translateY(0);     }
-}
+/* 11) Animations */
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px);} to { opacity: 1; transform: translateY(0);} }
+@keyframes fadeInUp   { from { opacity: 0; transform: translateY(20px);}  to { opacity: 1; transform: translateY(0);} }
 
-/* ————————————————————————————— */
-/* 12) RESPONSIVE BREAKPOINTS */
+/* 12) Responsive tweaks for tablets & phones */
 @media (max-width: 768px) {
-  header {
-    font-size: clamp(1.5rem, 6vw, 2rem);
-    margin: 15px 0;
-  }
+  header { font-size: clamp(1.5rem, 6vw, 2rem); margin: 15px 0; }
   .input-area {
     bottom: 50px;
-    left: 15px; right: 15px;
     padding: 8px 12px;
+    left: 15px; right: 15px;
     gap: 8px;
   }
   .input-area input {
@@ -190,17 +157,15 @@ footer {
     width: 36px; height: 36px;
   }
   #chat-box {
-    padding-bottom: 140px;
+    padding-bottom: 75px; /* Adjust for smaller input area on tablets */
   }
 }
 @media (max-width: 480px) {
-  header {
-    font-size: clamp(1.2rem, 8vw, 1.8rem);
-  }
+  header { font-size: clamp(1.2rem, 8vw, 1.8rem); }
   .input-area {
     bottom: 45px;
-    left: 10px; right: 10px;
     padding: 6px 10px;
+    left: 10px; right: 10px;
     gap: 6px;
   }
   .input-area input {
@@ -211,6 +176,6 @@ footer {
     width: 32px; height: 32px;
   }
   #chat-box {
-    padding-bottom: 120px;
+    padding-bottom: 65px; /* Adjust for smaller input area on mobile */
   }
 }
