@@ -10,22 +10,19 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Particle banner section -->
-  <section id="banner">
-    <div>
-      <h1>Particle connection</h1>
-      <p>Hover on to see connection between particles</p>
-    </div>
-    <canvas id="canvas"></canvas>
-  </section>
+  <!-- Particle canvas background -->
+  <canvas id="canvas"></canvas>
 
-  <main>
+  <!-- All content on top of particle background -->
+  <div class="content">
     <header>🤖 Talk to Ora</header>
+
     <div id="chat-box">
       <div class="ai-msg fade-in">Hi, I’m Ora, Zaky’s personal assistant. How can I assist you today?</div>
     </div>
+
     <div class="input-area">
-      <input type="text" id="userInput" aria-label="Type your message here" placeholder="Type your message..." autocomplete="off" />
+      <input type="text" id="userInput" aria-label="Type your message" placeholder="Type your message..." autocomplete="off" />
       <button id="sendBtn">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="12" r="11" fill="white"/>
@@ -33,8 +30,9 @@
         </svg>
       </button>
     </div>
+
     <footer>Built with ❤️ by Zakria Khan – Powered by Gemini</footer>
-  </main>
+  </div>
 
   <script src="script.js"></script>
 </body>
