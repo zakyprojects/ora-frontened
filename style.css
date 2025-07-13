@@ -1,17 +1,20 @@
-/* 1) Global Reset */
-* {
+/* ————————————————————————————— */
+/* 1) RESET & BOX-SIZING */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* 2) Prevent page scrolling so only #chat-box scrolls */
+/* ————————————————————————————— */
+/* 2) PREVENT WHOLE-PAGE SCROLL */
 html, body {
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
-/* 3) Base Styles */
+/* ————————————————————————————— */
+/* 3) BODY BASE */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom right, #0d1117, #161b22);
@@ -20,29 +23,32 @@ body {
   flex-direction: column;
 }
 
-/* 4) Main container */
+/* ————————————————————————————— */
+/* 4) MAIN WRAPPER */
 main {
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: 20px;
   position: relative;
-  min-height: 0; /* allow flex children to shrink */
+  /* allow children to shrink for flex scroll to work */
+  min-height: 0;
 }
 
-/* 5) Particle canvas behind content */
+/* ————————————————————————————— */
+/* 5) PARTICLE CANVAS */
 #canvas {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   z-index: -1;
   pointer-events: none;
 }
 
-/* 6) Header */
+/* ————————————————————————————— */
+/* 6) HEADER */
 header {
+  flex: 0 0 auto;
   font-size: clamp(1.8rem, 5vw, 2.5rem);
   font-weight: bold;
   color: #58a6ff;
@@ -52,19 +58,23 @@ header {
   animation: fadeInDown 0.8s ease-out;
 }
 
-/* 7) Chat Box */
+/* ————————————————————————————— */
+/* 7) CHAT BOX (SCROLLABLE) */
 #chat-box {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 15px;
   padding: 10px;
-  padding-bottom: 140px; /* reserve space for input bar */
-  min-height: 0; /* enable scrolling */
+  /* reserve space so messages never go under input+footer */
+  padding-bottom: 200px;
+  overflow-y: auto;
+  min-height: 0; /* critical for flex children */
+  overscroll-behavior: contain;
 }
 
-/* 8) Messages */
+/* ————————————————————————————— */
+/* 8) MESSAGES */
 .user-msg, .ai-msg {
   padding: 12px 18px;
   border-radius: 20px;
@@ -83,7 +93,8 @@ header {
   color: #e6edf3;
 }
 
-/* 9) Fixed Input Bar */
+/* ————————————————————————————— */
+/* 9) FIXED INPUT BAR */
 .input-area {
   position: fixed;
   bottom: 60px;
@@ -116,8 +127,7 @@ header {
 }
 .input-area button {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 40px; height: 40px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -130,11 +140,11 @@ header {
   transform: scale(0.95);
 }
 .input-area button svg {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
 }
 
-/* 10) Footer */
+/* ————————————————————————————— */
+/* 10) FOOTER */
 footer {
   position: fixed;
   bottom: 0;
@@ -144,10 +154,12 @@ footer {
   color: #8b949e;
   padding: 8px 0;
   font-size: 0.85rem;
+  background: transparent;
   animation: fadeInUp 0.8s ease-out 0.3s both;
 }
 
-/* 11) Animations */
+/* ————————————————————————————— */
+/* 11) ANIMATIONS */
 @keyframes fadeInDown {
   from { opacity: 0; transform: translateY(-20px); }
   to   { opacity: 1; transform: translateY(0);     }
@@ -157,7 +169,8 @@ footer {
   to   { opacity: 1; transform: translateY(0);     }
 }
 
-/* 12) Responsive Breakpoints */
+/* ————————————————————————————— */
+/* 12) RESPONSIVE BREAKPOINTS */
 @media (max-width: 768px) {
   header {
     font-size: clamp(1.5rem, 6vw, 2rem);
@@ -165,8 +178,7 @@ footer {
   }
   .input-area {
     bottom: 50px;
-    left: 15px;
-    right: 15px;
+    left: 15px; right: 15px;
     padding: 8px 12px;
     gap: 8px;
   }
@@ -175,11 +187,10 @@ footer {
     font-size: 0.95rem;
   }
   .input-area button {
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
   }
   #chat-box {
-    padding-bottom: 115px;
+    padding-bottom: 140px;
   }
 }
 @media (max-width: 480px) {
@@ -188,8 +199,7 @@ footer {
   }
   .input-area {
     bottom: 45px;
-    left: 10px;
-    right: 10px;
+    left: 10px; right: 10px;
     padding: 6px 10px;
     gap: 6px;
   }
@@ -198,10 +208,9 @@ footer {
     font-size: 0.9rem;
   }
   .input-area button {
-    width: 32px;
-    height: 32px;
+    width: 32px; height: 32px;
   }
   #chat-box {
-    padding-bottom: 100px;
+    padding-bottom: 120px;
   }
 }
