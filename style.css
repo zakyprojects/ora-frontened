@@ -1,4 +1,4 @@
-/* Fixed full-screen canvas behind all content */
+/* Full-screen particle canvas behind content */
 #canvas {
   position: fixed;
   top: 0;
@@ -9,7 +9,7 @@
   pointer-events: none;
 }
 
-/* UI content wrapper */
+/* Wrapper for UI */
 .content {
   position: relative;
   z-index: 1;
@@ -18,7 +18,7 @@
   min-height: 100vh;
 }
 
-/* Reset and base styles */
+/* Reset & Base */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,7 +40,7 @@ header {
   animation: fadeInDown 0.8s ease-out;
 }
 
-/* Chat box */
+/* Chat Box */
 #chat-box {
   flex: 1;
   overflow-y: auto;
@@ -69,43 +69,58 @@ header {
   color: #e6edf3;
 }
 
-/* Input area */
+/* Input Area */
 .input-area {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 20px;
+  gap: 8px;
+  padding: 8px 16px;
   background: rgba(13,17,23,0.9);
   border-radius: 30px;
   margin: 10px 20px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.5);
   position: sticky;
   bottom: 0;
   width: calc(100% - 40px);
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 .input-area input {
-  flex: 1; padding: 14px; border-radius: 24px;
-  border: 1px solid #58a6ff; background-color: #0d1117;
-  color: #e6edf3; outline: none;
+  flex: 1;
+  padding: 12px;
+  border-radius: 20px;
+  border: 1px solid #58a6ff;
+  background-color: #0d1117;
+  color: #e6edf3;
+  outline: none;
+  font-size: 1rem;
   transition: box-shadow 0.3s, border-color 0.3s;
 }
 .input-area input:focus {
-  box-shadow: 0 0 12px #58a6ff;
+  box-shadow: 0 0 8px #58a6ff;
   border-color: #58a6ff;
 }
 .input-area button {
-  background: #2d6db3; border: none; border-radius: 18px;
-  padding: 14px; cursor: pointer;
-  box-shadow: 0 0 6px #2d6db3;
-  transition: background 0.3s;
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
-.input-area button:hover { background: #4692dc; }
+.input-area button svg path {
+  transition: fill 0.3s;
+}
+.input-area button:hover svg path {
+  fill: #4692dc;
+}
 
 /* Footer */
 footer {
   text-align: center;
   color: #8b949e;
-  padding: 10px 0;
+  padding: 8px 0;
   font-size: 0.85rem;
   animation: fadeInUp 0.8s ease-out 0.3s both;
 }
@@ -117,9 +132,10 @@ footer {
 /* Responsive */
 @media (max-width: 768px) {
   header { font-size: clamp(1.5rem,6vw,2rem); margin: 15px 0; }
-  .input-area { margin: 10px 15px; }
+  .input-area { margin: 8px 15px; width: calc(100% - 30px); }
 }
 @media (max-width: 480px) {
   header { font-size: clamp(1.2rem,8vw,1.8rem); }
-  .input-area { margin: 8px 10px; }
+  .input-area { margin: 6px 10px; width: calc(100% - 20px); }
+  #chat-box { padding: 8px; gap: 10px; }
 }
