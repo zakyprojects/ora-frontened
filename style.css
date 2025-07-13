@@ -61,13 +61,19 @@ header {
 }
 .user-msg {
   align-self: flex-end;
-  background-color: #238636; /* original green ▼ */
+  background-color: #238636;
   color: #fff;
 }
 .ai-msg {
   align-self: flex-start;
   background-color: #343942;
   color: #e6edf3;
+}
+
+/* Loading indicator styling */
+.ai-msg.loading {
+  font-style: italic;
+  opacity: 0.7;
 }
 
 /* 7) Input area container (dark overlay) */
@@ -79,38 +85,37 @@ header {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(13, 17, 23, 0.9); /* original panel ▼ */
+  background: rgba(13, 17, 23, 0.9);
   padding: 10px;
   border-radius: 30px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   z-index: 2;
 }
 
-/* 8) User input – dark field with blue outline and glow ▼ */
+/* 8) User input */
 .input-area input {
   flex-grow: 1;
   padding: 16px;
   border-radius: 24px;
-  border: 1px solid #58a6ff;            /* original outline ▼ */ 
-  background-color: #0d1117;            /* dark fill ▼ */
+  border: 1px solid #58a6ff;
+  background-color: #0d1117;
   color: #e6edf3;
   font-size: 1rem;
-  box-shadow: 0 0 10px #58a6ff;         /* soft glow ▼ */
+  box-shadow: 0 0 10px #58a6ff;
   outline: none;
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .input-area input:focus {
-  box-shadow: 0 0 12px #58a6ff;         /* stronger glow on focus ▼ */
+  box-shadow: 0 0 12px #58a6ff;
   border-color: #58a6ff;
 }
-/* :contentReference[oaicite:3]{index=3} */
 
-/* 9) Send button – white SVG circle with blue arrow, no blue bg ▼ */
+/* 9) Send button */
 .input-area button {
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: transparent; /* back to transparent ▼ */
+  background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
@@ -126,7 +131,6 @@ header {
   width: 100%;
   height: 100%;
 }
-/* SVG itself draws the white circle and blue arrow ▼ */
 
 /* 10) Footer */
 footer {
@@ -158,9 +162,15 @@ footer {
     width: 36px; height: 36px;
   }
   #chat-box {
-    padding-bottom: 75px; /* Adjust for smaller input area on tablets */
+    padding-bottom: 75px;
+  }
+  /* Loading indicator adjustments */
+  .ai-msg.loading {
+    font-size: 0.9rem;
+    padding: 10px 14px;
   }
 }
+
 @media (max-width: 480px) {
   header { font-size: clamp(1.2rem, 8vw, 1.8rem); }
   .input-area {
@@ -177,6 +187,11 @@ footer {
     width: 32px; height: 32px;
   }
   #chat-box {
-    padding-bottom: 65px; /* Adjust for smaller input area on mobile */
+    padding-bottom: 65px;
+  }
+  /* Loading indicator adjustments */
+  .ai-msg.loading {
+    font-size: 0.8rem;
+    padding: 8px 12px;
   }
 }

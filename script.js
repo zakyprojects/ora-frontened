@@ -1,4 +1,4 @@
-// Particle Connection background (unchanged) …
+// Particle Connection background (unchanged)
 (function() {
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
@@ -73,6 +73,7 @@ const inputEl = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const chatBox = document.getElementById('chat-box');
 let chatHistory = [{ role: 'system', content: 'You are Ora, a personal AI assistant...' }];
+let isFirstMessage = true;
 
 function appendMessage(text, cls) {
   const msg = document.createElement('div');
@@ -92,6 +93,15 @@ async function sendMessage() {
   inputEl.value = '';
   sendBtn.disabled = true;
 
+  // Show loading indicator
+  const loadingMsg = document.createElement('div');
+  loadingMsg.className = 'ai-msg loading fade-in new';
+  loadingMsg.textContent = isFirstMessage
+    ? '⏳ Server is starting, please wait...'
+    : '⏳ Loading...';
+  chatBox.appendChild(loadingMsg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
   try {
     const res = await fetch(`${BACKEND_URL}/chat`, {
       method: 'POST',
@@ -103,22 +113,25 @@ async function sendMessage() {
     try {
       data = await res.json();
     } catch {
+      loadingMsg.remove();
       appendMessage('⚠️ Invalid response from server.', 'ai-msg');
       return;
     }
 
+    loadingMsg.remove();
+
     if (!res.ok) {
-      // show server-side error (e.g. quota, internal)
       appendMessage(`⚠️ ${data.error || 'Server error occurred.'}`, 'ai-msg');
     } else {
       appendMessage(data.reply, 'ai-msg');
       chatHistory.push({ role: 'assistant', content: data.reply });
     }
   } catch (error) {
-    // network or CORS failure
+    loadingMsg.remove();
     appendMessage('⚠️ Could not reach Ora backend.', 'ai-msg');
   } finally {
     sendBtn.disabled = false;
+    isFirstMessage = false;
   }
 }
 
