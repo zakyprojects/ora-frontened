@@ -51,7 +51,7 @@ header {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  padding-bottom: 90px;
+  padding-bottom: 150px;
 }
 
 .user-msg, .ai-msg {
@@ -169,7 +169,7 @@ footer {
     width: 36px; height: 36px;
   }
   #chat-box {
-    padding-bottom: 75px;
+    padding-bottom: 120px;
   }
   .ai-msg.loading {
     font-size: 0.9rem;
@@ -193,7 +193,7 @@ footer {
     width: 32px; height: 32px;
   }
   #chat-box {
-    padding-bottom: 65px;
+    padding-bottom: 110px;
   }
   .ai-msg.loading {
     font-size: 0.8rem;
