@@ -372,7 +372,7 @@
   var timers = [];
 
   function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
-  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function clearTimers() { timers.forEach(function (t) { if (t && t.cancel) t.cancel(); else clearTimeout(t); }); timers = []; }
   function scrollDown() { thread.scrollTop = thread.scrollHeight; }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function setBusy(v) { busy = v; send.disabled = v || !input.value.trim(); }
@@ -473,27 +473,38 @@
 
     if (reduceMotion) { finish(); return; }
     body.setAttribute('aria-busy', 'true');
-    var si = 0, wi = 0;
-    function tick() {
-      if (si >= steps.length) { finish(); return; }
-      var st = steps[si], pause;
-      if (st.kind === 'line') {
-        show(st); si += 1; pause = 60;
-        var lastLn = st.pre.lastChild; if (lastLn) lastLn.appendChild(caret);
-      } else {
-        show(st);
-        wi += 1;
-        st.node.textContent = st.words.slice(0, wi).join(' ');
-        st.node.appendChild(caret);
-        var w = st.words[wi - 1] || '';
-        pause = /[.!?:]$/.test(w) ? 130 : /,$/.test(w) ? 65 : 24 + Math.random() * 20;
-        if (wi >= st.words.length) { si += 1; wi = 0; pause += 80; }
+
+    // Smooth typing: one animation frame loop, characters added at a steady speed
+    // to a single text node (no re-rendering of the whole line on every word).
+    var CPS = 75;                         // characters per second
+    var si = 0, ci = 0, textNode = null, carry = 0, lastT = 0, raf = 0, pauseUntil = 0;
+    function frame(t) {
+      if (!lastT) lastT = t;
+      var dt = Math.min(t - lastT, 50); lastT = t;
+      if (t < pauseUntil) { raf = requestAnimationFrame(frame); return; }
+      carry += dt * CPS / 1000;
+      while (carry >= 1 && si < steps.length) {
+        var st = steps[si];
+        if (st.kind === 'line') {
+          show(st); si += 1; carry -= 6;
+          var lastLn = st.pre.lastChild; if (lastLn) lastLn.appendChild(caret);
+          continue;
+        }
+        if (!textNode) { show(st); st.node.textContent = ''; textNode = document.createTextNode(''); st.node.appendChild(textNode); st.node.appendChild(caret); st.full = st.words.join(' '); }
+        var take = Math.min(Math.floor(carry), st.full.length - ci);
+        textNode.nodeValue += st.full.slice(ci, ci + take);
+        ci += take; carry -= take;
+        var ch = st.full.charAt(ci - 1);
+        if (ci >= st.full.length) { si += 1; ci = 0; textNode = null; carry = 0; pauseUntil = t + 140; break; }
+        if (/[.!?]/.test(ch) && st.full.charAt(ci) === ' ') { carry = 0; pauseUntil = t + 110; break; }
       }
       if (follow) scrollDown();
-      later(tick, pause);
+      if (si >= steps.length) { finish(); return; }
+      raf = requestAnimationFrame(frame);
     }
+    raf = requestAnimationFrame(frame);
+    timers.push({ raf: true, cancel: function () { cancelAnimationFrame(raf); } });
     stopWriting = function () { clearTimers(); finish(); };
-    tick();
   }
 
   // "Thinking" for a moment, then the answer.
