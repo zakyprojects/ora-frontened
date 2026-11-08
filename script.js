@@ -374,40 +374,80 @@
     scrollDown();
   }
 
-  function addOra(answer) {
-    var el = bubble('ora');
+  // Ora writes her answer word by word, like someone typing it out.
+  var stopWriting = null;
+  var thinkTimer = null;
+  function addOra(answer, done) {
+    var el = bubble('ora writing');
+    var parts = [];                     // [{node, text}] filled in order
     answer.reply.forEach(function (part) {
       if (typeof part === 'string') {
         var p = document.createElement('p');
-        p.textContent = part;
         el.appendChild(p);
+        parts.push({ node: p, text: part });
       } else if (part.list) {
         var ul = document.createElement('ul');
+        el.appendChild(ul);
         part.list.forEach(function (item) {
           var li = document.createElement('li');
-          li.textContent = item;
           ul.appendChild(li);
+          parts.push({ node: li, text: item });
         });
-        el.appendChild(ul);
       }
     });
-    if (answer.links && answer.links.length) {
-      var row = document.createElement('div');
-      row.className = 'links';
-      answer.links.forEach(function (key) {
-        var l = LINKS[key];
-        var a = document.createElement('a');
-        a.href = l.href;
-        a.textContent = l.label;
-        if (l.href.indexOf('http') === 0) { a.target = '_blank'; a.rel = 'noopener'; }
-        row.appendChild(a);
-      });
-      el.appendChild(row);
+
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('aria-hidden', 'true');
+    var follow = true;                  // keep scrolling only if the reader hasn't scrolled up
+    var onScroll = function () { follow = thread.scrollHeight - thread.scrollTop - thread.clientHeight < 60; };
+    thread.addEventListener('scroll', onScroll);
+
+    function finish() {
+      stopWriting = null;
+      thread.removeEventListener('scroll', onScroll);
+      parts.forEach(function (x) { x.node.textContent = x.text; });
+      caret.remove();
+      el.classList.remove('writing');
+      el.removeAttribute('aria-busy');
+      if (answer.links && answer.links.length) {
+        var row = document.createElement('div');
+        row.className = 'links';
+        answer.links.forEach(function (key) {
+          var l = LINKS[key];
+          var a = document.createElement('a');
+          a.href = l.href;
+          a.textContent = l.label;
+          if (l.href.indexOf('http') === 0) { a.target = '_blank'; a.rel = 'noopener'; }
+          row.appendChild(a);
+        });
+        el.appendChild(row);
+      }
+      setChips(answer.next || START_CHIPS);
+      if (follow) scrollDown();
+      if (done) done();
     }
-    setChips(answer.next || START_CHIPS);
-    // Long answers: show their first line, not their last.
-    if (el.offsetHeight > thread.clientHeight - 80) thread.scrollTop = el.offsetTop - thread.offsetTop - 12;
-    else scrollDown();
+
+    if (reduceMotion) { finish(); return; }
+
+    el.setAttribute('aria-busy', 'true');
+    var pi = 0, wi = 0, words = parts.map(function (x) { return x.text.split(' '); });
+    if (parts[0]) parts[0].node.appendChild(caret);
+    var timer = null;
+    function tick() {
+      if (pi >= parts.length) { finish(); return; }
+      var w = words[pi];
+      wi += 1;
+      parts[pi].node.textContent = w.slice(0, wi).join(' ');
+      parts[pi].node.appendChild(caret);
+      if (follow) scrollDown();
+      var last = w[wi - 1] || '';
+      var pause = /[.!?:]$/.test(last) ? 140 : /,$/.test(last) ? 70 : 28 + Math.random() * 22;
+      if (wi >= w.length) { pi += 1; wi = 0; pause += 90; }
+      timer = setTimeout(tick, pause);
+    }
+    stopWriting = function () { clearTimeout(timer); finish(); };
+    tick();
   }
 
   function setChips(list) {
@@ -438,22 +478,21 @@
       answer = { reply: ['Same answer as a moment ago:'].concat(answer.reply), links: answer.links, next: answer.next };
     }
     lastAsked = asked;
-    var words = answer.reply.reduce(function (n, p) { return n + (typeof p === 'string' ? p : p.list.join(' ')).split(' ').length; }, 0);
-    var delay = reduceMotion ? 150 : Math.min(1400, 450 + words * 12);
-
-    var dots = document.createElement('div');
-    dots.className = 'typing';
-    dots.setAttribute('aria-label', 'Ora is typing');
-    dots.innerHTML = '<i></i><i></i><i></i>';
-    thread.appendChild(dots);
+    var thinking = document.createElement('div');
+    thinking.className = 'typing';
+    thinking.setAttribute('role', 'status');
+    thinking.innerHTML = '<span>Thinking</span><i></i><i></i><i></i>';
+    thread.appendChild(thinking);
     scrollDown();
 
-    setTimeout(function () {
-      dots.remove();
-      addOra(answer);
-      busy = false;
-      send.disabled = !input.value.trim();
-    }, delay);
+    thinkTimer = setTimeout(function () {
+      thinkTimer = null;
+      thinking.remove();
+      addOra(answer, function () {
+        busy = false;
+        send.disabled = !input.value.trim();
+      });
+    }, reduceMotion ? 150 : 650 + Math.random() * 450);
   }
 
   function start() {
@@ -462,20 +501,22 @@
     note.className = 'day-note';
     note.textContent = 'Answers written by Zakria';
     thread.appendChild(note);
+    busy = true;
     addOra({
       reply: ['Hi, I\'m Ora. I know Zakria\'s work by heart: his projects, his skills, and how to reach him. Ask me anything about it, or tap a question below.'],
       next: START_CHIPS
-    });
+    }, function () { busy = false; send.disabled = !input.value.trim(); });
   }
 
+  thread.addEventListener('click', function (e) { if (stopWriting && e.target.closest('.writing')) stopWriting(); });
   form.addEventListener('submit', function (e) { e.preventDefault(); ask(input.value); });
   input.addEventListener('input', function () { send.disabled = busy || !input.value.trim(); });
-  document.getElementById('reset-btn').addEventListener('click', function () { if (!busy) { start(); input.focus(); } });
+  document.getElementById('reset-btn').addEventListener('click', function () { clearTimeout(thinkTimer); thinkTimer = null; if (stopWriting) stopWriting(); start(); input.focus(); });
 
   // ---------- Theme ----------
   var root = document.documentElement;
   var meta = document.querySelector('meta[name="theme-color"]');
-  function syncMeta() { meta.content = root.dataset.theme === 'dark' ? '#181614' : '#faf7f2'; }
+  function syncMeta() { meta.content = root.dataset.theme === 'dark' ? '#0f131b' : '#eef1f6'; }
   syncMeta();
   document.getElementById('theme-btn').addEventListener('click', function () {
     if (root.dataset.theme === 'dark') delete root.dataset.theme; else root.dataset.theme = 'dark';
