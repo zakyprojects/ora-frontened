@@ -566,7 +566,7 @@
   input.addEventListener('input', function () { send.disabled = busy || !input.value.trim(); });
   document.getElementById('reset-btn').addEventListener('click', function () { start(); input.focus(); });
 
-  // ---------- Theme (dark by default) ----------
+  // ---------- Theme (follows the device/browser until the visitor picks one) ----------
   var root = document.documentElement;
   var meta = document.querySelector('meta[name="theme-color"]');
   function syncMeta() { meta.content = root.dataset.theme === 'light' ? '#f4f3ef' : '#0d1015'; }
@@ -576,6 +576,13 @@
     syncMeta();
   }
   syncMeta();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+    var saved = null;
+    try { saved = localStorage.getItem('ora_theme'); } catch (err) {}
+    if (saved === 'dark' || saved === 'light') return;
+    root.dataset.theme = e.matches ? 'dark' : 'light';
+    syncMeta();
+  });
   document.getElementById('theme-btn').addEventListener('click', toggleTheme);
 
   start();
