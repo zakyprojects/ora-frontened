@@ -20,6 +20,28 @@
     services: { label: 'Services', href: 'https://zakyprojects.github.io/#services' }
   };
 
+  // Which "file" each answer comes from. Shown while Ora looks it up, and in the explorer.
+  var FILES = {
+    about: 'about.md', location: 'about.md', lang: 'about.md', interests: 'about.md', why: 'about.md', experience: 'about.md', cv: 'about.md',
+    build: 'projects/README.md', ascend: 'projects/ascendday.tsx', 'ascend-tech': 'projects/ascendday.tsx',
+    tradeedge: 'projects/tradeedge.ts', finance: 'projects/finance-tracker.js', small: 'projects/small-apps/', code: 'projects/README.md',
+    ora: 'ora.md', stack: 'stack.json', edu: 'education.md',
+    hire: 'services.md', services: 'services.md', price: 'services.md', reviews: 'services.md', contact: 'contact.ts'
+  };
+  var TREE = [
+    { file: 'about.md', q: 'Who is Zakria?' },
+    { folder: 'projects' },
+    { file: 'projects/ascendday.tsx', q: 'Tell me about AscendDay', nested: true },
+    { file: 'projects/tradeedge.ts', q: 'Tell me about TradeEdge', nested: true },
+    { file: 'projects/finance-tracker.js', q: 'Tell me about the Finance Tracker', nested: true },
+    { file: 'projects/small-apps/', q: 'Show the small projects', nested: true },
+    { file: 'stack.json', q: 'What\'s his stack?' },
+    { file: 'services.md', q: 'What services does he offer?' },
+    { file: 'education.md', q: 'Where did he study?' },
+    { file: 'contact.ts', q: 'How do I contact him?' },
+    { file: 'ora.md', q: 'How do you work?' }
+  ];
+
   // Each answer: keywords (single words or short phrases), the reply, optional links and follow-up chips.
   var ANSWERS = [
     {
@@ -78,12 +100,15 @@
       keys: ['how is ascendday built', 'under the hood', 'architecture', 'backend', 'database', 'security', 'how built', 'tech behind'],
       weight: 2,
       reply: [
-        'Under the hood, AscendDay runs on React, TypeScript, Vite and Tailwind, with Supabase for the backend.',
-        { list: [
-          'Postgres with row-level security, so each person only sees their own data.',
-          'Scheduled jobs and edge functions on the server.',
-          'Automated tests, plus a CI check before every deploy on Vercel.',
-          'Installable as a PWA, with offline use and push reminders.'
+        'Under the hood, AscendDay runs on React, TypeScript, Vite and Tailwind, with Supabase for the backend:',
+        { code: 'tree', name: 'ascendday/', text: [
+          'ascendday/',
+          '├── client    React · TypeScript · Vite · Tailwind',
+          '├── data      Postgres + row-level security (you only see your own data)',
+          '├── server    edge functions · scheduled jobs · server-side points',
+          '├── sync      offline first, synced across devices',
+          '├── app       installable PWA with push reminders',
+          '└── ship      automated tests → CI check → Vercel'
         ] }
       ],
       links: ['ascend'],
@@ -125,12 +150,15 @@
       id: 'stack',
       keys: ['stack', 'skills', 'skill', 'tech', 'technologies', 'languages programming', 'react', 'typescript', 'supabase', 'javascript', 'tools', 'know', 'frontend', 'front end'],
       reply: [
-        'His main stack is React, TypeScript and Supabase.',
-        { list: [
-          'Front end: React, TypeScript, JavaScript, HTML, CSS, Tailwind CSS.',
-          'Back end: Supabase, PostgreSQL, SQL, edge functions.',
-          'Tools: Git, GitHub, Vite, Vercel, VS Code.',
-          'Also: Python, Flask, SQLite, C, C++.'
+        'His main stack is React, TypeScript and Supabase. Here\'s the full list:',
+        { code: 'json', name: 'stack.json', text: [
+          '{',
+          '  "main": ["React", "TypeScript", "Supabase"],',
+          '  "frontend": ["React", "TypeScript", "JavaScript", "HTML", "CSS", "Tailwind CSS"],',
+          '  "backend": ["Supabase", "PostgreSQL", "SQL", "Edge Functions"],',
+          '  "tools": ["Git", "GitHub", "Vite", "Vercel", "VS Code"],',
+          '  "also": ["Python", "Flask", "SQLite", "C", "C++"]',
+          '}'
         ] }
       ],
       next: ['What services does he offer?', 'Where did he study?']
@@ -177,7 +205,18 @@
     {
       id: 'contact',
       keys: ['contact', 'rabta', 'number de', 'email', 'reach', 'message', 'talk', 'linkedin', 'github', 'mail', 'social', 'connect'],
-      reply: ['You can email him at mzakriakhan55@gmail.com, or find him on LinkedIn and GitHub.'],
+      reply: [
+        'Email is the quickest way. He\'s also on LinkedIn and GitHub:',
+        { code: 'ts', name: 'contact.ts', text: [
+          'export const contact = {',
+          '  email: "mzakriakhan55@gmail.com",',
+          '  linkedin: "linkedin.com/in/zakria-khan-dev",',
+          '  github: "github.com/zakyprojects",',
+          '  based: "Risalpur, Pakistan",',
+          '  works: "remote",',
+          '};'
+        ] }
+      ],
       links: ['email', 'linkedin', 'github'],
       next: ['Is he available for work?']
     },
@@ -319,6 +358,7 @@
     return prev[b.length] <= 1 || (a.length > 6 && prev[b.length] <= 2);
   }
 
+  var NO_FUZZY = ['offtopic', 'private', 'rude'];   // these only fire on exact words
   var misses = 0;
   var lastAsked = null;
 
@@ -336,7 +376,7 @@
         var key = normalize(k);
         var size = key.trim().split(' ').length;
         if (q.indexOf(key) !== -1) score += size;               // exact word or phrase
-        else if (size === 1 && key.trim().length >= 5 && words.some(function (w) { return w.length >= 4 && close(w, key.trim()); })) score += 0.8; // near miss
+        else if (size === 1 && NO_FUZZY.indexOf(a.id) === -1 && key.trim().length >= 5 && words.some(function (w) { return w.length >= 4 && close(w, key.trim()); })) score += 0.8; // near miss
       });
       score *= a.weight || 1;
       if (score > bestScore) { bestScore = score; best = a; }
@@ -356,72 +396,127 @@
   var form = document.getElementById('composer');
   var input = document.getElementById('input');
   var send = document.getElementById('send');
-  var busy = false;
+  var tabFile = document.getElementById('tab-file');
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var busy = false;
+  var asked = 0;
+  var stopWriting = null;
+  var timers = [];
 
+  function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
   function scrollDown() { thread.scrollTop = thread.scrollHeight; }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function extOf(name) { return /\/$/.test(name) ? 'dir' : (name.split('.').pop() || ''); }
+  function setBusy(v) { busy = v; send.disabled = v || !input.value.trim(); }
 
-  function bubble(cls) {
-    var el = document.createElement('div');
-    el.className = 'msg ' + cls;
-    thread.appendChild(el);
-    return el;
+  function head(who, extra) {
+    var h = el('div', 'entry-head');
+    if (who === 'ora') { var img = el('img'); img.src = 'avatar.svg'; img.alt = ''; h.appendChild(img); }
+    h.appendChild(el('span', 'who', who));
+    if (extra) h.appendChild(extra);
+    return h;
   }
 
   function addMine(text) {
-    var el = bubble('me');
-    el.textContent = text;
+    var e = el('div', 'entry me');
+    e.appendChild(head('you'));
+    e.appendChild(el('div', 'body', text));
+    thread.appendChild(e);
     scrollDown();
   }
 
-  // Ora writes her answer word by word, like someone typing it out.
-  var stopWriting = null;
-  var thinkTimer = null;
+  // Tiny highlighter for the code cards (json / ts / tree). Builds DOM nodes, never HTML strings.
+  function paintLine(line, lang) {
+    var span = el('span', 'ln');
+    if (lang === 'tree') {
+      var m = line.match(/^([│├└─\s]*)(\S+)(\s*)(.*)$/);
+      if (!m) { span.textContent = line; return span; }
+      span.appendChild(el('span', 't-dim', m[1]));
+      span.appendChild(el('span', 't-key', m[2]));
+      span.appendChild(document.createTextNode(m[3]));
+      span.appendChild(el('span', 't-str', m[4]));
+      return span;
+    }
+    var re = /("(?:[^"\\]|\\.)*")(\s*:)?|\b(export|const|let|return)\b|(\d+(?:\.\d+)?)|([{}\[\],;:=])|([A-Za-z_$][\w$]*)(\s*:)?/g;
+    var last = 0, m2;
+    while ((m2 = re.exec(line))) {
+      if (m2.index > last) span.appendChild(document.createTextNode(line.slice(last, m2.index)));
+      if (m2[1]) { span.appendChild(el('span', m2[2] ? 't-key' : 't-str', m2[1])); if (m2[2]) span.appendChild(el('span', 't-pun', m2[2])); }
+      else if (m2[3]) span.appendChild(el('span', 't-kw', m2[3]));
+      else if (m2[4]) span.appendChild(el('span', 't-num', m2[4]));
+      else if (m2[5]) span.appendChild(el('span', 't-pun', m2[5]));
+      else if (m2[6]) { span.appendChild(el('span', m2[7] ? 't-key' : '', m2[6])); if (m2[7]) span.appendChild(el('span', 't-pun', m2[7])); }
+      last = re.lastIndex;
+    }
+    if (last < line.length) span.appendChild(document.createTextNode(line.slice(last)));
+    return span;
+  }
+
+  // Ora's reply: written word by word, code cards line by line.
   function addOra(answer, done) {
-    var el = bubble('ora writing');
-    var parts = [];                     // [{node, text}] filled in order
+    var e = el('div', 'entry ora writing');
+    var src = null;
+    var file = answer.id && FILES[answer.id];
+    if (file) { src = el('span', 'src'); src.appendChild(document.createTextNode('· from ')); src.appendChild(el('b', '', file)); }
+    e.appendChild(head('ora', src));
+    var body = el('div', 'body');
+    e.appendChild(body);
+    thread.appendChild(e);
+
+    var steps = [];                      // each step reveals one piece
     answer.reply.forEach(function (part) {
       if (typeof part === 'string') {
-        var p = document.createElement('p');
-        el.appendChild(p);
-        parts.push({ node: p, text: part });
+        var p = el('p'); body.appendChild(p); p.hidden = true;
+        steps.push({ kind: 'words', node: p, words: part.split(' ') });
       } else if (part.list) {
-        var ul = document.createElement('ul');
-        el.appendChild(ul);
-        part.list.forEach(function (item) {
-          var li = document.createElement('li');
-          ul.appendChild(li);
-          parts.push({ node: li, text: item });
+        var ul = el('ul'); body.appendChild(ul); ul.hidden = true;
+        part.list.forEach(function (item, i) {
+          var li = el('li'); ul.appendChild(li);
+          steps.push({ kind: 'words', node: li, words: item.split(' '), parent: i === 0 ? ul : null });
+        });
+      } else if (part.code) {
+        var card = el('div', 'code'); card.hidden = true;
+        var ch = el('div', 'code-head');
+        ch.appendChild(el('span', '', part.name));
+        ch.appendChild(el('span', '', part.code === 'tree' ? 'tree' : part.code));
+        card.appendChild(ch);
+        var pre = el('pre'); card.appendChild(pre); body.appendChild(card);
+        part.text.forEach(function (line, i) {
+          steps.push({ kind: 'line', pre: pre, line: line, lang: part.code, parent: i === 0 ? card : null });
         });
       }
     });
 
-    var caret = document.createElement('span');
-    caret.className = 'caret';
-    caret.setAttribute('aria-hidden', 'true');
-    var follow = true;                  // keep scrolling only if the reader hasn't scrolled up
-    var onScroll = function () { follow = thread.scrollHeight - thread.scrollTop - thread.clientHeight < 60; };
+    var caret = el('span', 'caret'); caret.setAttribute('aria-hidden', 'true');
+    var follow = true;
+    function onScroll() { follow = thread.scrollHeight - thread.scrollTop - thread.clientHeight < 80; }
     thread.addEventListener('scroll', onScroll);
+
+    function show(step, full) {
+      if (step.parent) step.parent.hidden = false;
+      if (step.kind === 'line') { if (!step.done) { step.pre.appendChild(paintLine(step.line, step.lang)); step.done = true; } return; }
+      step.node.hidden = false;
+      if (full) step.node.textContent = step.words.join(' ');
+    }
 
     function finish() {
       stopWriting = null;
       thread.removeEventListener('scroll', onScroll);
-      parts.forEach(function (x) { x.node.textContent = x.text; });
+      steps.forEach(function (st) { show(st, true); });
       caret.remove();
-      el.classList.remove('writing');
-      el.removeAttribute('aria-busy');
+      e.classList.remove('writing');
+      body.removeAttribute('aria-busy');
       if (answer.links && answer.links.length) {
-        var row = document.createElement('div');
-        row.className = 'links';
+        var row = el('div', 'links');
         answer.links.forEach(function (key) {
           var l = LINKS[key];
-          var a = document.createElement('a');
+          var a = el('a', '', l.label);
           a.href = l.href;
-          a.textContent = l.label;
           if (l.href.indexOf('http') === 0) { a.target = '_blank'; a.rel = 'noopener'; }
           row.appendChild(a);
         });
-        el.appendChild(row);
+        body.appendChild(row);
       }
       setChips(answer.next || START_CHIPS);
       if (follow) scrollDown();
@@ -429,100 +524,254 @@
     }
 
     if (reduceMotion) { finish(); return; }
-
-    el.setAttribute('aria-busy', 'true');
-    var pi = 0, wi = 0, words = parts.map(function (x) { return x.text.split(' '); });
-    if (parts[0]) parts[0].node.appendChild(caret);
-    var timer = null;
+    body.setAttribute('aria-busy', 'true');
+    var si = 0, wi = 0;
     function tick() {
-      if (pi >= parts.length) { finish(); return; }
-      var w = words[pi];
-      wi += 1;
-      parts[pi].node.textContent = w.slice(0, wi).join(' ');
-      parts[pi].node.appendChild(caret);
+      if (si >= steps.length) { finish(); return; }
+      var st = steps[si], pause;
+      if (st.kind === 'line') {
+        show(st); si += 1; pause = 70;
+        var lastLn = st.pre.lastChild; if (lastLn) lastLn.appendChild(caret);
+      } else {
+        show(st);
+        wi += 1;
+        st.node.textContent = st.words.slice(0, wi).join(' ');
+        st.node.appendChild(caret);
+        var w = st.words[wi - 1] || '';
+        pause = /[.!?:]$/.test(w) ? 130 : /,$/.test(w) ? 65 : 24 + Math.random() * 20;
+        if (wi >= st.words.length) { si += 1; wi = 0; pause += 80; }
+      }
       if (follow) scrollDown();
-      var last = w[wi - 1] || '';
-      var pause = /[.!?:]$/.test(last) ? 140 : /,$/.test(last) ? 70 : 28 + Math.random() * 22;
-      if (wi >= w.length) { pi += 1; wi = 0; pause += 90; }
-      timer = setTimeout(tick, pause);
+      later(tick, pause);
     }
-    stopWriting = function () { clearTimeout(timer); finish(); };
+    stopWriting = function () { clearTimers(); finish(); };
     tick();
+  }
+
+  // A short, honest "thinking" log: what Ora is actually doing to find the answer.
+  function think(answer, then) {
+    var box = el('div', 'think');
+    box.setAttribute('role', 'status');
+    var spinChars = ['◐', '◓', '◑', '◒'];
+    function line(text, file) {
+      var l = el('div');
+      var sp = el('span', 'spin', '◐');
+      l.appendChild(sp);
+      l.appendChild(document.createTextNode(text));
+      if (file) l.appendChild(el('b', '', file));
+      box.appendChild(l);
+      return sp;
+    }
+    thread.appendChild(box);
+    var t0 = performance.now();
+    var sp1 = line('thinking');
+    var frame = 0;
+    var spinTimer = setInterval(function () { frame += 1; box.querySelectorAll('.spin:not(.ok)').forEach(function (s) { s.textContent = spinChars[frame % spinChars.length]; }); }, 110);
+    timers.push(spinTimer);
+    scrollDown();
+    var file = answer.id && FILES[answer.id];
+    later(function () {
+      sp1.textContent = '✓'; sp1.className = 'spin ok';
+      if (file) {
+        var sp2 = line('reading ', file);
+        openTab(file);
+        later(function () { sp2.textContent = '✓'; sp2.className = 'spin ok'; end(); }, 420 + Math.random() * 250);
+      } else end();
+    }, 480 + Math.random() * 300);
+    function end() {
+      clearInterval(spinTimer);
+      var ms = Math.round(performance.now() - t0);
+      var l = el('div'); l.appendChild(el('span', 'spin ok', '✓')); l.appendChild(document.createTextNode('answer ready in ' + (ms / 1000).toFixed(1) + 's'));
+      box.appendChild(l);
+      later(function () { box.remove(); then(); }, 260);
+    }
+  }
+
+  function openTab(file) {
+    tabFile.hidden = false;
+    tabFile.textContent = '';
+    tabFile.appendChild(el('span', 'dot-file ' + extOf(file)));
+    tabFile.appendChild(document.createTextNode(file.split('/').filter(Boolean).pop() + (/\/$/.test(file) ? '/' : '')));
+    document.querySelectorAll('.ex-file').forEach(function (b) { b.classList.toggle('active', b.dataset.file === file); });
   }
 
   function setChips(list) {
     chips.innerHTML = '';
     list.forEach(function (text) {
-      var b = document.createElement('button');
+      var b = el('button', 'chip', text);
       b.type = 'button';
-      b.className = 'chip';
-      b.textContent = text;
       b.addEventListener('click', function () { ask(text); });
       chips.appendChild(b);
     });
     chips.scrollLeft = 0;
   }
 
+  var lastAsked = null;
   function ask(text) {
-    text = text.trim();
+    text = String(text).trim();
     if (!text || busy) return;
-    busy = true;
-    send.disabled = true;
+    setBusy(true);
+    closeExplorer();
     addMine(text);
     input.value = '';
+    asked += 1;
+    document.getElementById('sb-count').textContent = asked + (asked === 1 ? ' question' : ' questions');
 
     var answer = pick(text);
-    // The exact same question twice in a row gets a short note instead of a silent copy.
-    var asked = normalize(text);
-    if (asked === lastAsked && answer.id && ['thanks', 'greet', 'salam'].indexOf(answer.id) === -1) {
-      answer = { reply: ['Same answer as a moment ago:'].concat(answer.reply), links: answer.links, next: answer.next };
+    var norm = normalize(text);
+    if (norm === lastAsked && answer.id && ['thanks', 'greet', 'salam'].indexOf(answer.id) === -1) {
+      answer = { id: answer.id, reply: ['Same answer as a moment ago:'].concat(answer.reply), links: answer.links, next: answer.next };
     }
-    lastAsked = asked;
-    var thinking = document.createElement('div');
-    thinking.className = 'typing';
-    thinking.setAttribute('role', 'status');
-    thinking.innerHTML = '<span>Thinking</span><i></i><i></i><i></i>';
-    thread.appendChild(thinking);
-    scrollDown();
+    lastAsked = norm;
 
-    thinkTimer = setTimeout(function () {
-      thinkTimer = null;
-      thinking.remove();
-      addOra(answer, function () {
-        busy = false;
-        send.disabled = !input.value.trim();
-      });
-    }, reduceMotion ? 150 : 650 + Math.random() * 450);
+    var go = function () { addOra(answer, function () { setBusy(false); }); };
+    if (reduceMotion) go(); else think(answer, go);
   }
 
   function start() {
+    clearTimers();
+    stopWriting = null;
     thread.innerHTML = '';
-    var note = document.createElement('p');
-    note.className = 'day-note';
-    note.textContent = 'Answers written by Zakria';
-    thread.appendChild(note);
-    busy = true;
+    tabFile.hidden = true;
+    document.querySelectorAll('.ex-file').forEach(function (b) { b.classList.remove('active'); });
+    lastAsked = null;
+    var boot = el('div', 'boot');
+    [['ora', ' v2 · demo build'], ['loaded', ' ' + TREE.filter(function (n) { return n.file; }).length + ' files from ~/zakria'], ['mode', ' hand-written answers, no AI, nothing leaves your browser']].forEach(function (r) {
+      var l = el('div'); l.appendChild(el('b', '', r[0])); l.appendChild(document.createTextNode(r[1])); boot.appendChild(l);
+    });
+    thread.appendChild(boot);
+    setBusy(true);
     addOra({
-      reply: ['Hi, I\'m Ora. I know Zakria\'s work by heart: his projects, his skills, and how to reach him. Ask me anything about it, or tap a question below.'],
+      reply: ['Hi, I\'m Ora. I know Zakria\'s work by heart: his projects, his stack, and how to reach him. Ask me anything, open a file on the left, or press Ctrl K to see every question.'],
       next: START_CHIPS
-    }, function () { busy = false; send.disabled = !input.value.trim(); });
+    }, function () { setBusy(false); });
   }
 
-  thread.addEventListener('click', function (e) { if (stopWriting && e.target.closest('.writing')) stopWriting(); });
+  // ---------- Explorer ----------
+  var tree = document.getElementById('ex-tree');
+  TREE.forEach(function (n) {
+    if (n.folder) {
+      var f = el('div', 'ex-folder');
+      f.appendChild(el('span', 'chev', '▾')); f.appendChild(document.createTextNode(n.folder));
+      tree.appendChild(f);
+      return;
+    }
+    var b = el('button', 'ex-file' + (n.nested ? ' nested' : ''));
+    b.type = 'button';
+    b.dataset.file = n.file;
+    b.appendChild(el('span', 'dot-file ' + extOf(n.file)));
+    b.appendChild(document.createTextNode(n.file.replace(/^projects\//, '')));
+    b.addEventListener('click', function () { if (stopWriting) stopWriting(); ask(n.q); });
+    tree.appendChild(b);
+  });
+
+  var explorer = document.getElementById('explorer');
+  var scrim = document.getElementById('scrim');
+  var filesBtn = document.getElementById('files-btn');
+  function closeExplorer() { explorer.classList.remove('open'); scrim.hidden = true; filesBtn.setAttribute('aria-expanded', 'false'); }
+  filesBtn.addEventListener('click', function () {
+    var open = !explorer.classList.contains('open');
+    explorer.classList.toggle('open', open); scrim.hidden = !open; filesBtn.setAttribute('aria-expanded', String(open));
+  });
+  scrim.addEventListener('click', closeExplorer);
+
+  // ---------- Command palette ----------
+  var palette = document.getElementById('palette');
+  var pInput = document.getElementById('palette-input');
+  var pList = document.getElementById('palette-list');
+  var QUESTIONS = ['Who is Zakria?', 'What does Zakria build?', 'Tell me about AscendDay', 'How is AscendDay built?', 'Tell me about TradeEdge', 'Tell me about the Finance Tracker', 'Show the small projects', 'What\'s his stack?', 'Where did he study?', 'What services does he offer?', 'How much does he charge?', 'Is he available for work?', 'Why should I hire him?', 'Does he have reviews?', 'How do I contact him?', 'What languages does he speak?', 'How do you work?'];
+  var COMMANDS = [
+    { label: 'New chat', ic: '↺', run: function () { start(); } },
+    { label: 'Switch light or dark theme', ic: '◐', run: function () { toggleTheme(); } },
+    { label: 'Open portfolio', ic: '↗', run: function () { window.open('https://zakyprojects.github.io/', '_blank', 'noopener'); } },
+    { label: 'Open AscendDay', ic: '↗', run: function () { window.open('https://ascendday.com', '_blank', 'noopener'); } },
+    { label: 'Email Zakria', ic: '@', run: function () { location.href = LINKS.email.href; } }
+  ];
+  var pItems = [], pSel = 0, lastFocus = null;
+
+  function renderPalette() {
+    var q = pInput.value.toLowerCase().trim();
+    pList.innerHTML = '';
+    pItems = [];
+    function group(name, list) {
+      var hits = list.filter(function (x) { return (x.label || x).toLowerCase().indexOf(q) !== -1; });
+      if (!hits.length) return;
+      pList.appendChild(el('li', 'group', name));
+      hits.forEach(function (x) {
+        var item = typeof x === 'string' ? { label: x, ic: '›', run: function () { ask(x); } } : x;
+        var li = el('li', 'item');
+        li.setAttribute('role', 'option');
+        li.appendChild(el('span', 'ic', item.ic));
+        li.appendChild(document.createTextNode(item.label));
+        var idx = pItems.length;
+        li.addEventListener('mousemove', function () { if (pSel !== idx) { pSel = idx; mark(); } });
+        li.addEventListener('click', function () { choose(idx); });
+        pList.appendChild(li);
+        pItems.push({ li: li, item: item });
+      });
+    }
+    group('Questions', QUESTIONS);
+    group('Commands', COMMANDS);
+    if (!pItems.length) {
+      var typed = pInput.value.trim();
+      var li = el('li', 'item');
+      li.appendChild(el('span', 'ic', '›'));
+      li.appendChild(document.createTextNode('Ask: ' + typed));
+      li.addEventListener('click', function () { choose(0); });
+      pList.appendChild(li);
+      pItems.push({ li: li, item: { run: function () { ask(typed); } } });
+    }
+    pSel = 0; mark();
+  }
+  function mark() { pItems.forEach(function (x, i) { x.li.classList.toggle('sel', i === pSel); x.li.setAttribute('aria-selected', String(i === pSel)); }); if (pItems[pSel]) pItems[pSel].li.scrollIntoView({ block: 'nearest' }); }
+  function openPalette() { lastFocus = document.activeElement; palette.hidden = false; pInput.value = ''; renderPalette(); pInput.focus(); }
+  function closePalette() { palette.hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+  function choose(i) {
+    var x = pItems[i]; if (!x) return;
+    closePalette();
+    if (busy && stopWriting) stopWriting();
+    x.item.run();
+  }
+  pInput.addEventListener('input', renderPalette);
+  pInput.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); pSel = (pSel + 1) % pItems.length; mark(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); pSel = (pSel - 1 + pItems.length) % pItems.length; mark(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (pInput.value.trim() || pItems.length) choose(pSel); }
+    else if (e.key === 'Escape') { e.preventDefault(); closePalette(); }
+    else if (e.key === 'Tab') { e.preventDefault(); }
+  });
+  palette.addEventListener('mousedown', function (e) { if (e.target === palette) closePalette(); });
+  document.getElementById('palette-btn').addEventListener('click', openPalette);
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); if (palette.hidden) openPalette(); else closePalette(); }
+    else if (e.key === '/' && palette.hidden && document.activeElement !== input) { e.preventDefault(); input.focus(); }
+    else if (e.key === 'Escape' && palette.hidden && stopWriting) { stopWriting(); }
+  });
+
+  // ---------- Composer ----------
+  thread.addEventListener('click', function (e) { if (stopWriting && e.target.closest('.writing') && !e.target.closest('a')) stopWriting(); });
   form.addEventListener('submit', function (e) { e.preventDefault(); ask(input.value); });
   input.addEventListener('input', function () { send.disabled = busy || !input.value.trim(); });
-  document.getElementById('reset-btn').addEventListener('click', function () { clearTimeout(thinkTimer); thinkTimer = null; if (stopWriting) stopWriting(); start(); input.focus(); });
+  document.getElementById('reset-btn').addEventListener('click', function () { start(); input.focus(); });
 
-  // ---------- Theme ----------
+  // ---------- Status bar clock (Zakria's local time) ----------
+  var clock = document.getElementById('sb-clock');
+  function tickClock() {
+    try { clock.textContent = 'Risalpur ' + new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Karachi' }).format(new Date()); } catch (e) { clock.hidden = true; }
+  }
+  tickClock(); setInterval(tickClock, 30000);
+
+  // ---------- Theme (dark by default) ----------
   var root = document.documentElement;
   var meta = document.querySelector('meta[name="theme-color"]');
-  function syncMeta() { meta.content = root.dataset.theme === 'dark' ? '#0f131b' : '#eef1f6'; }
-  syncMeta();
-  document.getElementById('theme-btn').addEventListener('click', function () {
-    if (root.dataset.theme === 'dark') delete root.dataset.theme; else root.dataset.theme = 'dark';
-    try { localStorage.setItem('ora_theme', root.dataset.theme === 'dark' ? 'dark' : 'light'); } catch (e) {}
+  function syncMeta() { meta.content = root.dataset.theme === 'light' ? '#f4f3ef' : '#0b0e14'; }
+  function toggleTheme() {
+    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+    try { localStorage.setItem('ora_theme', root.dataset.theme); } catch (e) {}
     syncMeta();
-  });
+  }
+  syncMeta();
+  document.getElementById('theme-btn').addEventListener('click', toggleTheme);
 
   start();
 })();
